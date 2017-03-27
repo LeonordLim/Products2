@@ -44,7 +44,7 @@ public class ProductCursorAdapter extends CursorAdapter {
         priceTextView.append(String.valueOf(cursor.getInt(cursor.getColumnIndex(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE))));
         priceTextView.append("/-");
         Button button= (Button) view.findViewById(R.id.button);
-        final int id=view.getId();
+        final int id=cursor.getInt(cursor.getColumnIndex(ProductContract.ProductEntry._ID));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,7 +54,7 @@ public class ProductCursorAdapter extends CursorAdapter {
                 ContentValues values=new ContentValues();
                 values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY,quantity);
                 String selection= ProductContract.ProductEntry._ID+"=?";
-                String[] selectionArgs={String.valueOf(43)};
+                String[] selectionArgs={String.valueOf(id)};
                 int success=context1.getContentResolver().update(ProductContract.ProductEntry.CONTENT_URI,values,selection,selectionArgs);
                 Log.v(LOG_TAG,String.valueOf(success));
             }
