@@ -241,7 +241,7 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
             orderStock(finalQuantity);
 
             orderButton=!orderButton;
-            Intent i=new Intent(Intent.ACTION_SEND);
+            final Intent i=new Intent(Intent.ACTION_SEND);
             i.putExtra(Intent.EXTRA_SUBJECT,"Order");
             String body=currentName+"\n"+currentSupplier;
             i.putExtra(Intent.EXTRA_TEXT,body);
@@ -251,11 +251,26 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
             findViewById(R.id.linear_price).setVisibility(View.VISIBLE);
             findViewById(R.id.linear_supplier).setVisibility(View.VISIBLE);
             findViewById(R.id.linear_order_quantity).setVisibility(View.GONE);
-            if(i.resolveActivity(getPackageManager())!=null){
-                startActivity(i);
-            }else{
-                finish();
-            }
+            AlertDialog.Builder builder=new AlertDialog.Builder(this);
+            builder.setMessage("Email or Direct");
+            builder.setPositiveButton("Email", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if(i.resolveActivity(getPackageManager())!=null){
+                        startActivity(i);
+                    }else{
+                        finish();
+                    }
+                }
+            });
+            builder.setNegativeButton("Direct", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            AlertDialog alertDialog=builder.create();
+            alertDialog.show();
         }
     }
 
