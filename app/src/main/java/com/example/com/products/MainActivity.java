@@ -10,6 +10,7 @@ import android.database.DataSetObserver;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements android.app.Loade
     ProductCursorAdapter adapter;
     ListView listView;
     public static final int LOADER_ID1=1;
+    public final String LOG_TAG=MainActivity.this.getClass().getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements android.app.Loade
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i=new Intent(MainActivity.this,DetailsActivity.class);
                 i.setData(ContentUris.withAppendedId(ProductContract.ProductEntry.CONTENT_URI,id));
+                Log.v(LOG_TAG,ContentUris.withAppendedId(ProductContract.ProductEntry.CONTENT_URI,id).toString());
+                Log.v(LOG_TAG, ProductContract.ProductEntry.CONTENT_URI.toString());
                 startActivity(i);
             }
         });

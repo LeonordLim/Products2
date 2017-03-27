@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import com.example.com.products.data.ProductContract;
  */
 
 public class ProductCursorAdapter extends CursorAdapter {
+    public  final String LOG_TAG= ProductCursorAdapter.this.getClass().getSimpleName();
     public ProductCursorAdapter(Context context, Cursor c) {
         super(context, c, 0);
     }
@@ -52,8 +54,9 @@ public class ProductCursorAdapter extends CursorAdapter {
                 ContentValues values=new ContentValues();
                 values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY,quantity);
                 String selection= ProductContract.ProductEntry._ID+"=?";
-                String[] selectionArgs={String.valueOf(0)};
-                context1.getContentResolver().update(ProductContract.ProductEntry.CONTENT_URI,values,selection,selectionArgs);
+                String[] selectionArgs={String.valueOf(id)};
+                int success=context1.getContentResolver().update(ProductContract.ProductEntry.CONTENT_URI,values,selection,selectionArgs);
+                Log.v(LOG_TAG,String.valueOf(success));
             }
         });
     }
