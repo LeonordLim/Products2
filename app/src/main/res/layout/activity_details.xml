@@ -8,6 +8,7 @@
     tools:context="com.example.com.products.DetailsActivity">
 
     <LinearLayout
+        android:id="@+id/linear_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -24,6 +25,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linear_quantity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -41,6 +43,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linear_price"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -59,6 +62,7 @@
 
 
     <LinearLayout
+        android:id="@+id/linear_supplier"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -72,5 +76,31 @@
             style="@style/editor"
             />
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/linear_order_quantity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            style="@style/category"
+            android:text="@string/productquantity"
+            />
+
+        <EditText
+            android:id="@+id/order_quantity"
+            style="@style/editor"
+            android:inputType="number"
+            />
+
+    </LinearLayout>
+    <Button
+        android:onClick="onClick"
+        android:id="@+id/order_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/order"
+        android:layout_gravity="center"/>
 
 </LinearLayout>

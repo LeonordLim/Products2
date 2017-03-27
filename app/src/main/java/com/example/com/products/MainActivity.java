@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.com.products.data.ProductContract;
@@ -26,7 +27,6 @@ public class MainActivity extends AppCompatActivity implements android.app.Loade
     ListView listView;
     public static final int LOADER_ID1=1;
     public final String LOG_TAG=MainActivity.this.getClass().getSimpleName();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

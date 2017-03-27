@@ -54,7 +54,7 @@ public class ProductCursorAdapter extends CursorAdapter {
                 ContentValues values=new ContentValues();
                 values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY,quantity);
                 String selection= ProductContract.ProductEntry._ID+"=?";
-                String[] selectionArgs={String.valueOf(id)};
+                String[] selectionArgs={String.valueOf(43)};
                 int success=context1.getContentResolver().update(ProductContract.ProductEntry.CONTENT_URI,values,selection,selectionArgs);
                 Log.v(LOG_TAG,String.valueOf(success));
             }

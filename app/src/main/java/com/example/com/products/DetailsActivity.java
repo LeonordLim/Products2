@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -37,9 +38,14 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
     EditText price;
     EditText supplier;
     boolean hasDataChanged;
+    Button orderButtonReference;
     Uri uri;
     boolean editMode;
+    boolean orderButton=true;
     public static final int LOADER_ID1=1;
+    String currentName;
+    String currentSupplier;
+    int currentQuantity;
 
     View.OnTouchListener listener=new View.OnTouchListener() {
         @Override
@@ -53,14 +59,15 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
+        orderButtonReference= (Button) findViewById(R.id.order_button);
        uri=getIntent().getData();
         if(uri==null){
             editMode=false;
+            orderButtonReference.setVisibility(View.GONE);
         }else
         {
             editMode=true;
         }
-
         name=(EditText)findViewById(R.id.name);
         quantity=(EditText)findViewById(R.id.quantity);
         price=(EditText)findViewById(R.id.price);
@@ -70,6 +77,9 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
         quantity.setOnTouchListener(listener);
         price.setOnTouchListener(listener);
         supplier.setOnTouchListener(listener);
+        if(editMode){
+            quantity.setEnabled(false);
+        }
 
 
         getLoaderManager().initLoader(LOADER_ID1,null,this);
@@ -136,7 +146,8 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
                 insertProduct();
                 finish();
                 return true;
-            case R.id.delete_one:delete();
+            case R.id.delete_one:
+                delete();
                 finish();
                 return true;
             case android.R.id.home:
@@ -174,7 +185,7 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
         values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME,name.getText().toString());
         values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE,Integer.parseInt(price.getText().toString()));
         values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY,Integer.parseInt(quantity.getText().toString()));
-        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_SUPPLIER,name.getText().toString());
+        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_SUPPLIER,supplier.getText().toString());
         if(editMode){
             getContentResolver().update(uri,values,null,null);
         }else {
@@ -200,9 +211,12 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(data.moveToNext()){
-            name.setText(data.getString(data.getColumnIndex(ProductEntry.COLUMN_PRODUCT_NAME)));
-            supplier.setText(data.getString(data.getColumnIndex(ProductEntry.COLUMN_PRODUCT_SUPPLIER)));
-            quantity.setText(String.valueOf(data.getInt(data.getColumnIndex(ProductEntry.COLUMN_PRODUCT_QUANTITY))));
+            currentName=data.getString(data.getColumnIndex(ProductEntry.COLUMN_PRODUCT_NAME));
+            name.setText(currentName);
+            currentSupplier=data.getString(data.getColumnIndex(ProductEntry.COLUMN_PRODUCT_SUPPLIER));
+            supplier.setText(currentSupplier);
+            currentQuantity=data.getInt(data.getColumnIndex(ProductEntry.COLUMN_PRODUCT_QUANTITY));
+            quantity.setText(String.valueOf(currentQuantity));
             price.setText(String.valueOf(data.getInt(data.getColumnIndex(ProductEntry.COLUMN_PRODUCT_PRICE))));
         }
     }
@@ -211,7 +225,44 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
-    
 
-/////////////////////////////////////////////////////////////
+    public void onClick(View view){
+        EditText quantityOrderEditText= (EditText) findViewById(R.id.order_quantity);
+        if(orderButton){
+            findViewById(R.id.linear_name).setVisibility(View.GONE);
+            findViewById(R.id.linear_quantity).setVisibility(View.GONE);
+            findViewById(R.id.linear_price).setVisibility(View.GONE);
+            findViewById(R.id.linear_supplier).setVisibility(View.GONE);
+            findViewById(R.id.linear_order_quantity).setVisibility(View.VISIBLE);
+            orderButton=!orderButton;
+        }else{
+            int finalQuantity=Integer.parseInt(quantityOrderEditText.getText().toString());
+            finalQuantity+=currentQuantity;
+            orderStock(finalQuantity);
+
+            orderButton=!orderButton;
+            Intent i=new Intent(Intent.ACTION_SEND);
+            i.putExtra(Intent.EXTRA_SUBJECT,"Order");
+            String body=currentName+"\n"+currentSupplier;
+            i.putExtra(Intent.EXTRA_TEXT,body);
+            i.setData(Uri.parse("mailto:"));
+            findViewById(R.id.linear_name).setVisibility(View.VISIBLE);
+            findViewById(R.id.linear_quantity).setVisibility(View.VISIBLE);
+            findViewById(R.id.linear_price).setVisibility(View.VISIBLE);
+            findViewById(R.id.linear_supplier).setVisibility(View.VISIBLE);
+            findViewById(R.id.linear_order_quantity).setVisibility(View.GONE);
+            if(i.resolveActivity(getPackageManager())!=null){
+                startActivity(i);
+            }else{
+                finish();
+            }
+        }
+    }
+
+    private void orderStock(int quantity) {
+        ContentValues values=new ContentValues();
+        values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY,quantity);
+        getContentResolver().update(uri,values,null,null);
+    }
+        //getContentResolver().update(uri,values,null,null);
 }
