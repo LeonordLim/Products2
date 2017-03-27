@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_details"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.com.products.DetailsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/category"
+            android:text="@string/product"
+            />
+
+        <EditText
+            android:id="@+id/name"
+           style="@style/editor"
+            tools:text="Mobile Phones"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/category"
+            android:text="@string/productquantity"
+            />
+
+        <EditText
+            android:id="@+id/quantity"
+            style="@style/editor"
+            android:inputType="number"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/category"
+            android:text="@string/price"
+            />
+
+        <EditText
+            android:id="@+id/price"
+            android:inputType="number"
+            style="@style/editor"
+            />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/category"
+            android:text="@string/supplier"
+            />
+
+        <EditText
+            android:id="@+id/supplier"
+            style="@style/editor"
+            />
+    </LinearLayout>
+
+</LinearLayout>

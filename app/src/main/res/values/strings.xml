@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Products</string>
+    <string name="empty_view_title_text">Its a bit lonely here....</string>
+    <string name="empty_view_subtitle_text">Get started by adding a product</string>
+    <string name="product">Product Name</string>
+    <string name="productquantity">Quantity</string>
+    <string name="price">Price</string>
+    <string name="supplier">Supplier</string>
+    <string name="Rs">Rs</string>
+    <string name="quantity">Quantity=</string>
+</resources>
