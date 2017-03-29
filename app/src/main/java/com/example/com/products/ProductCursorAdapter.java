@@ -49,14 +49,16 @@ public class ProductCursorAdapter extends CursorAdapter {
             @Override
             public void onClick(View v) {
                 int quantity=quantityNumber;
-                --quantity;
-                Toast.makeText(context1, "abc"+id, Toast.LENGTH_SHORT).show();
-                ContentValues values=new ContentValues();
-                values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY,quantity);
-                String selection= ProductContract.ProductEntry._ID+"=?";
-                String[] selectionArgs={String.valueOf(id)};
-                int success=context1.getContentResolver().update(ProductContract.ProductEntry.CONTENT_URI,values,selection,selectionArgs);
-                Log.v(LOG_TAG,String.valueOf(success));
+                if(quantity>0) {
+                    --quantity;
+                    ContentValues values = new ContentValues();
+                    values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY, quantity);
+                    String selection = ProductContract.ProductEntry._ID + "=?";
+                    String[] selectionArgs = {String.valueOf(id)};
+                    int success = context1.getContentResolver().update(ProductContract.ProductEntry.CONTENT_URI, values, selection, selectionArgs);
+                } else{
+                    Toast.makeText(context1, "Currently unavailable", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

@@ -9,11 +9,15 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,12 +36,16 @@ import com.example.com.products.data.ProductContract.ProductEntry;
 import com.example.com.products.data.ProductContract;
 import com.example.com.products.data.ProductSQLite;
 
+import java.io.IOException;
+
 public class DetailsActivity extends AppCompatActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor>{
 
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
     EditText name;
     EditText quantity;
     EditText price;
     EditText supplier;
+    ImageView imageView;
     boolean hasDataChanged;
     Button orderButtonReference;
     Uri uri;
@@ -46,6 +55,7 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
     String currentName;
     String currentSupplier;
     int currentQuantity;
+    Uri imageURI;
 
     View.OnTouchListener listener=new View.OnTouchListener() {
         @Override
@@ -72,6 +82,7 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
         quantity=(EditText)findViewById(R.id.quantity);
         price=(EditText)findViewById(R.id.price);
         supplier=(EditText)findViewById(R.id.supplier);
+        imageView= (ImageView) findViewById(R.id.image_view);
 
         name.setOnTouchListener(listener);
         quantity.setOnTouchListener(listener);
@@ -186,6 +197,9 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
         values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE,Integer.parseInt(price.getText().toString()));
         values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY,Integer.parseInt(quantity.getText().toString()));
         values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_SUPPLIER,supplier.getText().toString());
+        if (imageURI!=null){
+            values.put(ProductEntry.COLUMN_PRODUCT_IMAGE,imageURI.toString());
+        }
         if(editMode){
             getContentResolver().update(uri,values,null,null);
         }else {
@@ -200,7 +214,8 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
                     ProductEntry.COLUMN_PRODUCT_NAME,
                     ProductEntry.COLUMN_PRODUCT_QUANTITY,
                     ProductEntry.COLUMN_PRODUCT_PRICE,
-                    ProductEntry.COLUMN_PRODUCT_SUPPLIER};
+                    ProductEntry.COLUMN_PRODUCT_SUPPLIER,
+                    ProductEntry.COLUMN_PRODUCT_IMAGE};
             String selection = ProductEntry._ID + "=?";
             String[] selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
             return new CursorLoader(this, ProductEntry.CONTENT_URI, projection, selection, selectionArgs, null);
@@ -218,6 +233,17 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
             currentQuantity=data.getInt(data.getColumnIndex(ProductEntry.COLUMN_PRODUCT_QUANTITY));
             quantity.setText(String.valueOf(currentQuantity));
             price.setText(String.valueOf(data.getInt(data.getColumnIndex(ProductEntry.COLUMN_PRODUCT_PRICE))));
+            String storedUri=data.getString(data.getColumnIndex(ProductEntry.COLUMN_PRODUCT_IMAGE));
+            if(!TextUtils.isEmpty(storedUri)) {
+                Uri imageURI = Uri.parse(storedUri);
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageURI);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                imageView.setImageBitmap(bitmap);
+            }
         }
     }
 
@@ -233,6 +259,8 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
             findViewById(R.id.linear_quantity).setVisibility(View.GONE);
             findViewById(R.id.linear_price).setVisibility(View.GONE);
             findViewById(R.id.linear_supplier).setVisibility(View.GONE);
+            imageView.setVisibility(View.GONE);
+            findViewById(R.id.image_button).setVisibility(View.GONE);
             findViewById(R.id.linear_order_quantity).setVisibility(View.VISIBLE);
             orderButton=!orderButton;
         }else{
@@ -241,16 +269,16 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
             orderStock(finalQuantity);
 
             orderButton=!orderButton;
-            final Intent i=new Intent(Intent.ACTION_SEND);
+            final Intent i=new Intent(Intent.ACTION_SENDTO);
             i.putExtra(Intent.EXTRA_SUBJECT,"Order");
-            String body=currentName+"\n"+currentSupplier;
+            String body=currentName+"\n"+currentSupplier+"\n"+(finalQuantity-currentQuantity);
             i.putExtra(Intent.EXTRA_TEXT,body);
             i.setData(Uri.parse("mailto:"));
-            findViewById(R.id.linear_name).setVisibility(View.VISIBLE);
-            findViewById(R.id.linear_quantity).setVisibility(View.VISIBLE);
-            findViewById(R.id.linear_price).setVisibility(View.VISIBLE);
-            findViewById(R.id.linear_supplier).setVisibility(View.VISIBLE);
-            findViewById(R.id.linear_order_quantity).setVisibility(View.GONE);
+//            findViewById(R.id.linear_name).setVisibility(View.VISIBLE);
+//            findViewById(R.id.linear_quantity).setVisibility(View.VISIBLE);
+//            findViewById(R.id.linear_price).setVisibility(View.VISIBLE);
+//            findViewById(R.id.linear_supplier).setVisibility(View.VISIBLE);
+//            findViewById(R.id.linear_order_quantity).setVisibility(View.GONE);
             AlertDialog.Builder builder=new AlertDialog.Builder(this);
             builder.setMessage("Email or Direct");
             builder.setPositiveButton("Email", new DialogInterface.OnClickListener() {
@@ -279,5 +307,29 @@ public class DetailsActivity extends AppCompatActivity implements android.app.Lo
         values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY,quantity);
         getContentResolver().update(uri,values,null,null);
     }
-        //getContentResolver().update(uri,values,null,null);
+       public void loadImage(View v){
+           Intent intent = new Intent();
+// Show only images, no videos or anything else
+           intent.setType("image/*");
+           intent.setAction(Intent.ACTION_GET_CONTENT);
+// Always show the chooser (if there are multiple options available)
+           startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_IMAGE_CAPTURE);
+       }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==REQUEST_IMAGE_CAPTURE &&resultCode==RESULT_OK){
+//            Bundle extras = data.getExtras();
+//            bitmap = (Bitmap) extras.get("data");
+//            mImageView.setImageBitmap(bitmap);
+             imageURI=data.getData();
+            try {
+                Bitmap bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(), imageURI);
+                imageView.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

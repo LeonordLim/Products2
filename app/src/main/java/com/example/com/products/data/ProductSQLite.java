@@ -32,5 +32,6 @@ public class ProductSQLite extends SQLiteOpenHelper {
             ProductContract.ProductEntry.COLUMN_PRODUCT_NAME+" TEXT NOT NULL,"+
             ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY+" INTEGER,"+
             ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE+" INTEGER NOT NULL,"+
-            ProductContract.ProductEntry.COLUMN_PRODUCT_SUPPLIER+" TEXT NOT NULL );";
+            ProductContract.ProductEntry.COLUMN_PRODUCT_SUPPLIER+" TEXT NOT NULL,"+
+            ProductContract.ProductEntry.COLUMN_PRODUCT_IMAGE+" TEXT );";
 }
